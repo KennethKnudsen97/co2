@@ -4,7 +4,7 @@
 use core::panic;
 
 use co2 as _;
-use co2::buzz;
+use co2::buzzer;
 // global logger + panicking-behavior + memory layout
 // access to board peripherals:
 use co2::co2_mod;
@@ -21,20 +21,18 @@ use nrf52840_hal::{
 
 #[cortex_m_rt::entry]
 fn main() -> ! {
-    // take() returns all peripherals, so we can access them
     let board = hal::pac::Peripherals::take().unwrap();
-    // first peripheral: initialize timer
     let mut timer = Timer::new(board.TIMER0);
-
     let pins = P0Parts::new(board.P0);
 
     //Buzzer
-    let mut buzzer = buzz::Buzzer::init(pins.p0_28.degrade());
+    let mut buzzer = buzzer::Buzzer::init(pins.p0_28.degrade());
     buzzer.buzz(&mut timer, 440, 500);
 
     //LED
+    //LED on board
     let mut led_1 = pins.p0_13.into_push_pull_output(Level::Low);
-
+    //RGB led
     let led_channel_red = pins.p0_29.degrade();
     let led_channel_blue = pins.p0_30.degrade();
     let led_channel_green = pins.p0_31.degrade();
@@ -59,7 +57,7 @@ fn main() -> ! {
         firmware_version[1]
     );
 
-    let pressure = 994_u16;
+    let pressure = 994_u16; //air pressure in copenhagen
     sensor.start_continuous_measurement(pressure).unwrap();
 
     loop {
@@ -71,6 +69,7 @@ fn main() -> ! {
             light.red();
         }
     }
+
     loop {
         let result = sensor.read_measurement().unwrap_or_else(|error| {
             light.error_blink_red(&mut timer);

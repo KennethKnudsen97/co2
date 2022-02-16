@@ -8,7 +8,7 @@ use defmt_rtt as _; // global logger
 use nrf52840_hal as _; // memory layout
 
 use panic_probe as _;
-pub mod buzz;
+pub mod buzzer;
 pub mod co2_mod;
 pub mod dk_button;
 pub mod rgb_led;
